@@ -15,10 +15,10 @@ def home():
     return "HI THERE"
 
 # :text, :encrypt
-@app.route('/des-ede3', methods=['GET'])
+@app.route('/des-ede3', methods=['POST'])
 def des_ede3():
     des_ede3 = DesEde3()
-    json = request.args
+    json = request.json
     
     text:str = json['text']
     encrypt: bool = json['encrypt'] == "true"
