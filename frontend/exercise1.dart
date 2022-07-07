@@ -1,37 +1,51 @@
-import 'package:encryption_over_network/des_ede3.dart';
-import 'package:encryption_over_network/tuple.dart';
-import 'api.dart';
+// ignore_for_file: unused_local_variable
 
-//dart --no-sound-null-safety main.dart
+// Make sure encryption & decryption
+// from both side matched
+
+import 'api.dart';
+import './lib/tuple.dart';
+import './lib/des_ede3.dart';
+
+String key = '1234567890' * 2;
+
+// To execute:
+// dart --no-sound-null-safety exercise1.dart
 void main() async {
-  var encrypt = await des3_encryption('vatanak')
-    ..writeToFile();
-  var decrypt = await des3_dycryption('Thea')
-    ..writeToFile();
+  Tuple encrypt = await des3_encryption('vatanak');
+  await encrypt.writeToFile();
+
+  Tuple decrypt = await des3_dycryption('Thea');
+  await decrypt.writeToFile();
 }
 
+/// Expect [text] to match [plainText]:
+///
+/// text: initial text to encrypt
+/// plainText: decrypted by `frontend`
+///
 Future<Tuple> des3_encryption(String text) async {
-  Map jsonData = {
-    "text": text,
-    "encrypt": 'true',
-  };
+  Map jsonData = {"text": text, "encrypt": 'true'};
+  Map<dynamic, dynamic> json = await Api.post('des-ede3', jsonData);
+  dynamic cipherText = json['cipher_text'];
 
-  var json = await Api.post('des-ede3', jsonData);
-  var cipherText = json['cipher_text'];
-  var plainText = DesEde3.decrypt(cipherText, '1234567890' * 2);
-
+  /// decrypt ciphter text from server &
+  /// expect its result which is [plainText] to match initial plain text jsonData['text']
+  String plainText = DesEde3.decrypt(cipherText, key);
   return Tuple(cipherText, plainText);
 }
 
+/// Expect [text] to match [plainText]:
+///
+/// text: initial text to encrypt
+/// plainText: decrypted by `server`
+///
 Future<Tuple> des3_dycryption(String text) async {
-  var cipherText = DesEde3.encrypt(text, '1234567890' * 2);
-  Map jsonData = {
-    "text": cipherText,
-    "encrypt": 'false',
-  };
+  String cipherText = DesEde3.encrypt(text, key);
 
-  var json = await Api.post('des-ede3', jsonData);
-  var plainText = json['plain_text'];
+  Map jsonData = {"text": cipherText, "encrypt": 'false'};
+  Map<dynamic, dynamic> json = await Api.post('des-ede3', jsonData);
 
+  dynamic plainText = json['plain_text'];
   return Tuple(cipherText, plainText);
 }

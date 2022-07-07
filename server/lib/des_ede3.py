@@ -1,13 +1,3 @@
-# Mode - encrypt or decrypt (E/d): e
-# Input password: 1234567
-# Input plain text: 1234567876543
-
-# Ouput:
-# -------------------------------------
-# Cipher Text: YY/ZsZia+mHzzgVFrCKbsQ==
-# Plain Text: 1234567876543
-# -------------------------------------
-
 from Crypto.Cipher import DES3
 import base64
 
@@ -41,8 +31,4 @@ class DesEde3:
 
 
     def encode_key(self, key: str):
-        # salt = '\x28\xAB\xBC\xCD\xDE\xEF\x00\x33'
-        # key = password + salt
-        # m = hashlib.md5(key.encode('utf-8'))
-        # return m.digest()
         return key.encode('utf-8')[0:16]

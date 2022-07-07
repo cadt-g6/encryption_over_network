@@ -1,17 +1,9 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:aes_crypt/aes_crypt.dart';
-
-// void main() async {
-//   var image = File('encrypted 0.jpeg');
-
-//   var tt = AesFile('1234567890' * 2);
-//   // var encryt = await tt.encrypt(image);
-//   var decry = await tt.decrypt(image);
-
-//   print(tt);
-// }
 
 class AesFile {
   final String key;
@@ -19,7 +11,7 @@ class AesFile {
   late final List<int> encodedKey;
   late final AesCrypt crypt;
 
-  AesFile(this.key) {
+  AesFile({required this.key}) {
     encodedKey = utf8.encode(key).getRange(0, 16).toList();
     crypt = AesCrypt();
     crypt.aesSetMode(AesMode.ofb);
@@ -38,7 +30,7 @@ class AesFile {
     Uint8List data = Uint8List.fromList(list);
     Uint8List result = crypt.aesEncrypt(data);
 
-    File encrypted = File('encrypted.jpeg');
+    File encrypted = File('assets/encrypted.jpeg');
     await encrypted.writeAsBytes(result);
 
     return encrypted;
@@ -51,7 +43,7 @@ class AesFile {
     List<int> list = [...decrypted.toList()];
     while (list.last == 0) list.removeLast();
 
-    File encrypted = File('decrypted.jpeg');
+    File encrypted = File('assets/decrypted.jpeg');
     await encrypted.writeAsBytes(Uint8List.fromList(list));
 
     return encrypted;
