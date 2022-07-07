@@ -5,6 +5,7 @@ environment:
 dependencies: 
   aes_crypt: ^0.1.1
   crypto: ^3.0.2
+  cryptography: ^2.0.5
   dart_des: ^1.0.2
   encrypt: ^5.0.1
   http: ^0.13.4

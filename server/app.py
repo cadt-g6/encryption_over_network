@@ -1,10 +1,10 @@
 # flask run -p 5001
 
+from cgi import FieldStorage
 import flask
-from flask import jsonify, request
-from sqlalchemy import null
-
+from flask import jsonify, request, send_file
 from lib.des_ede3 import DesEde3
+from lib.des_ede3_file import DesEde3File
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -39,6 +39,24 @@ def des_ede3():
         "plain_text": plain_text,
     })
 
+@app.route('/encrypted_image', methods=['GET'])
+def encrypted_image():
+    des_ede3 = DesEde3File(key="1234567890" * 2)
+    encrypted = des_ede3.encrypt('image.jpeg')
+    return send_file(encrypted, attachment_filename='image.jpeg')
+
+@app.route('/decrypted_image', methods=['POST'])
+def decrypted_image():
+    result = request.files['body']
+    des_ede3 = DesEde3File(key="1234567890" * 2)
+    reader = result.read()
+    
+    encrypted_file = open("encrypted.jpeg", mode="wb")
+    with encrypted_file as ef:
+        ef.write(reader)
+    
+    des_ede3.decrypt('encrypted.jpeg')
+    return "GREAT"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
