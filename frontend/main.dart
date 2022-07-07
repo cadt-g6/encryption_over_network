@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter_tensorflow/des_ede3.dart';
-import 'package:http/http.dart' as http;
+import 'package:encryption_over_network/aes.dart';
+import 'package:encryption_over_network/des_ede3.dart';
+import 'api.dart';
 
 enum Mode { encrypt, decrypt }
 
@@ -20,26 +19,6 @@ class Tuple {
   writeToFile() {
     var file = File('cache.txt');
     file.writeAsString("$plainText $cypterText", mode: FileMode.append);
-  }
-}
-
-class Api {
-  static Future<Map> post(String path, Map body) async {
-    String host = '2358-203-189-153-190.ngrok.io';
-    var response = await http.post(
-      Uri(
-        host: host,
-        path: path,
-        scheme: 'http',
-      ),
-      headers: {
-        'Content-type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: jsonEncode(body),
-    );
-
-    return jsonDecode(response.body);
   }
 }
 
@@ -69,11 +48,30 @@ Future<Tuple> des3_dycryption(String text) async {
   return Tuple(cipherText, plainText);
 }
 
+Future<dynamic> imageDecryption() async {
+  var response = await Api.get('encrypted_image');
+
+  print('response $response');
+
+  var keyImage = AesFile('1234567890' * 2);
+  var decrypteImage = keyImage.decrypt(response);
+
+  return decrypteImage;
+}
+
+Future<dynamic> imageEncryption() async {
+  var keyImage = AesFile('1234567890' * 2);
+  var encryptedFile = await keyImage.encrypt(File('./assets/image.jpeg'));
+
+  await Api.send('decrypted_image', encryptedFile);
+  return encryptedFile;
+}
+
 void main() async {
-  var encrypt = await des3_encryption('abc')
-    ..writeToFile();
-  // var decrypt = await des3_dycryption('abc')
+  // var encrypt = await des3_encryption('vatanak')
   //   ..writeToFile();
-  // print(encrypt);
-  // print(decrypt);
+  // var decrypt = await des3_dycryption('Thea')
+  //   ..writeToFile();
+  // imageDecryption();
+  imageEncryption();
 }
