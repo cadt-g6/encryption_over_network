@@ -75,3 +75,5 @@ void main() async {
   // imageDecryption();
   imageEncryption();
 }
+
+//dart --no-sound-null-safety main.dart
